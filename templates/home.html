@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+  {% block content %}
+  <h2>Добро пожаловать!</h2>
+  <p>Вы успешно вошли в систему.</p>
+  <a href="{% url 'logout' %}">Выйти</a>
+  {% endblock %}
+
+
+</body>
+</html>
