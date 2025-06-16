@@ -14,9 +14,12 @@
         <input type="text" name="username"><br>
         <label>Пароль:</label><br>
         <input type="password" name="password"><br><br>
+
         <button type="submit">Войти</button>
     </form>
-
+    <p>Don't have an account?
+        <a href="{% url 'register' %}">Register</a>
+    </p>
 
     {% for message in messages %}
         <p style="color: red">{{ message }}</p>
