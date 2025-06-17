@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Регистрация</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .auth-container {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+    }
+    .user-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 12px;
+      fill: #74ebd5;
+    }
+    h2 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #555;
+      font-size: 13px;
+      text-align: left;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      font-size: 13px;
+      transition: border-color 0.3s;
+      appearance: none;
+      background-color: white;
+    }
+    input:focus, select:focus {
+      border-color: #74ebd5;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #74ebd5;
+      border: none;
+      border-radius: 7px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 6px;
+    }
+    button:hover {
+      background: #58cdd1;
+    }
+    .phone-field {
+      margin-bottom: 12px;
+    }
+    .phone-input-wrapper {
+      display: flex;
+      gap: 6px;
+    }
+    .phone-input-wrapper select {
+      flex: 0 0 70px;
+      padding-left: 30px;
+      background-repeat: no-repeat;
+      background-position: 7px center;
+      background-size: 22px 14px;
+      cursor: pointer;
+      border-radius: 7px;
+    }
+    .phone-input-wrapper input {
+      flex: 1;
+      border-radius: 7px;
+    }
+    .error-msg {
+      color: #d93025;
+      font-size: 11px;
+      margin-top: 3px;
+      display: none;
+      text-align: left;
+    }
+    .show-error {
+      display: block;
+    }
+    .format-hint {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-container" id="register-window">
+  <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M12 12c2.7 0 4.5-2.1 4.5-4.5S14.7 3 12 3 7.5 5.1 7.5 7.5 9.3 12 12 12zm0 2c-3 0-9 1.5-9 4.5V21h18v-2.5c0-3-6-4.5-9-4.5z"/>
+  </svg>
+
+  <h2>Регистрация</h2>
+  <form id="registerForm" action="/register" method="POST" novalidate>
+    <label>Email</label>
+    <input type="email" name="email" required>
+
+    <label>ФИО</label>
+    <input type="text" name="fullName" required>
+
+    <label>Логин</label>
+    <input type="text" name="login" required>
+
+    <label>Пароль</label>
+    <input type="password" name="password" required>
+
+    <label>Номер телефона</label>
+    <div class="phone-field">
+      <div class="phone-input-wrapper">
+        <select id="country-code" name="countryCode" required>
+          <option value="+7" data-flag="flags/ru.png" data-length="10">+7</option>
+          <option value="+1" data-flag="flags/us.png" data-length="10">+1</option>
+          <option value="+44" data-flag="flags/gb.png" data-length="10">+44</option>
+          <option value="+49" data-flag="flags/de.png" data-length="11">+49</option>
+          <option value="+380" data-flag="flags/ua.png" data-length="9">+380</option>
+          <option value="+375" data-flag="flags/by.png" data-length="9">+375</option>
+          <option value="+998" data-flag="flags/uz.png" data-length="9">+998</option>
+          <option value="+996" data-flag="flags/kg.png" data-length="9">+996</option>
+        </select>
+        <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Введите номер" required aria-describedby="phoneError">
+      </div>
+      <div id="phoneFormatHint" class="format-hint"></div>
+      <div id="phoneError" class="error-msg">Ошибка: неверный формат номера</div>
+    </div>
+
+    <label>Дата рождения</label>
+    <input type="date" name="birthDate" required>
+
+    <label>Код подтверждения</label>
+    <input type="text" name="confirmationCode" required>
+
+    <button type="submit">Зарегистрироваться</button>
+  </form>
+</div>
+
+<script>
+  const select = document.getElementById('country-code');
+  const phoneInput = document.getElementById('phoneNumber');
+  const phoneFormatHint = document.getElementById('phoneFormatHint');
+  const phoneError = document.getElementById('phoneError');
+
+  function updateFlag() {
+    const flagUrl = select.options[select.selectedIndex].getAttribute('data-flag');
+    select.style.backgroundImage = url(${flagUrl});
+  }
+
+  function updateFormatHint() {
+    const length = select.options[select.selectedIndex].getAttribute('data-length');
+    phoneFormatHint.textContent = Номер должен содержать ровно ${length} цифр (без кода страны).;
+  }
+
+  function validatePhone() {
+    const length = parseInt(select.options[select.selectedIndex].getAttribute('data-length'), 10);
+    const digits = phoneInput.value.replace(/\D/g, '');
+    if (digits.length === 0) {
+      phoneError.classList.remove('show-error');
+      return false;
+    }
+    if (digits.length !== length) {
+      phoneError.classList.add('show-error');
+      return false;
+    } else {
+      phoneError.classList.remove('show-error');
+      return true;
+    }
+  }
+
+  select.addEventListener('change', () => {
+    updateFlag();
+    updateFormatHint();
+    validatePhone();
+  });
+
+  phoneInput.addEventListener('input', validatePhone);
+  updateFlag();
+  updateFormatHint();
+
+  document.getElementById('registerForm').addEventListener('submit', (e) => {
+    if (!validatePhone()) {
+      e.preventDefault();
+      phoneInput.focus();
+      return;
+    }
+    e.preventDefault(); // пока нет сервера
+    alert("Регистрация успешна! Перенаправление на страницу авторизации...");
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1500);
+  });
+</script>
+
+</body>
+</html>
